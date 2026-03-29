@@ -1,4 +1,4 @@
-# 🤑 AI Money Mentor
+#  AI Money Mentor
 
 > **ET AI Hackathon 2026 — Problem Statement 9**
 > India's AI-powered personal finance mentor, built on NVIDIA NIM + FastAPI + SQLite.
@@ -11,7 +11,7 @@ AI Money Mentor gives every Indian retail investor access to a CFA-grade financi
 
 | Agent | What it answers |
 |---|---|
-| 💯 **Money Health Score** | How financially healthy am I? (6-dimension score) |
+| **Money Health Score** | How financially healthy am I? (6-dimension score) |
 | 🔥 **FIRE Planner** | Month-by-month roadmap to financial independence |
 | 🔬 **Portfolio X-Ray** | Is my mutual fund portfolio any good? |
 | 🧾 **Tax Wizard** | Old or new regime? What deductions am I missing? |
