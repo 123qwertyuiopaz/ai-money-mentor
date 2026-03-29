@@ -1,0 +1,55 @@
+CAMS - Consolidated Account Statement
+Investor: Test Investor | PAN: ABCDE1234F | As of: 01 Jan 2025
+
+────────────────────────────────────────────────────────
+Axis Bluechip Fund - Regular Plan - Growth
+ISIN: INF846K01DP8
+Units: 1234.567  |  NAV: ₹52.34  |  Current Value: ₹64,628
+Invested: ₹48,000  |  Gain/Loss: ₹16,628 (34.64%)
+
+────────────────────────────────────────────────────────
+Mirae Asset Large Cap Fund - Regular Plan - Growth
+ISIN: INF769K01EN2
+Units: 876.432  |  NAV: ₹94.12  |  Current Value: ₹82,493
+Invested: ₹60,000  |  Gain/Loss: ₹22,493 (37.49%)
+
+────────────────────────────────────────────────────────
+Parag Parikh Flexi Cap Fund - Regular Plan - Growth
+ISIN: INF879O01019
+Units: 543.210  |  NAV: ₹68.45  |  Current Value: ₹37,184
+Invested: ₹25,000  |  Gain/Loss: ₹12,184 (48.74%)
+
+────────────────────────────────────────────────────────
+HDFC Mid-Cap Opportunities Fund - Growth
+ISIN: INF179K01VW3
+Units: 321.098  |  NAV: ₹142.67  |  Current Value: ₹45,822
+Invested: ₹30,000  |  Gain/Loss: ₹15,822 (52.74%)
+
+────────────────────────────────────────────────────────
+Quant Small Cap Fund - Growth
+ISIN: INF966L01131
+Units: 189.456  |  NAV: ₹236.80  |  Current Value: ₹44,844
+Invested: ₹20,000  |  Gain/Loss: ₹24,844 (124.22%)
+
+────────────────────────────────────────────────────────
+Mirae Asset Tax Saver Fund - Regular Plan - Growth (ELSS)
+ISIN: INF769K01DM1
+Units: 456.789  |  NAV: ₹36.21  |  Current Value: ₹16,541
+Invested: ₹12,000  |  Gain/Loss: ₹4,541 (37.84%)
+
+────────────────────────────────────────────────────────
+SBI Nifty Index Fund - Regular Plan - Growth
+ISIN: INF200K01804
+Units: 2345.678  |  NAV: ₹22.15  |  Current Value: ₹51,957
+Invested: ₹40,000  |  Gain/Loss: ₹11,957 (29.89%)
+
+────────────────────────────────────────────────────────
+HDFC Corporate Bond Fund - Growth
+ISIN: INF179K01VX1
+Units: 1567.890  |  NAV: ₹29.34  |  Current Value: ₹46,001
+Invested: ₹42,000  |  Gain/Loss: ₹4,001 (9.52%)
+
+────────────────────────────────────────────────────────
+Total Portfolio Value: ₹3,89,470
+Total Invested: ₹2,77,000
+Total Gain: ₹1,12,470 (40.60%)

@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Money Mentor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080C12;
+  --bg2:#0E1420;
+  --bg3:#141C2B;
+  --card:#111827;
+  --border:#1E2D45;
+  --gold:#D4A843;
+  --gold2:#F0C060;
+  --gold-dim:#7A5E20;
+  --text:#F0EEE8;
+  --muted:#6B7A8F;
+  --green:#2ECC71;
+  --red:#E74C3C;
+  --blue:#4A9EFF;
+  --r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden;}
+
+/* ── BACKGROUND ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 20% -10%,rgba(212,168,67,.07) 0%,transparent 60%),
+             radial-gradient(ellipse 50% 40% at 80% 110%,rgba(74,158,255,.06) 0%,transparent 60%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── AUTH SCREEN ── */
+#auth-screen{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  z-index:100;background:var(--bg);
+}
+.auth-box{
+  width:420px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:48px 44px;
+  box-shadow:0 40px 80px rgba(0,0,0,.6);
+  animation:slideUp .5s ease;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+.auth-logo{
+  text-align:center;margin-bottom:36px;
+}
+.auth-logo .logo-symbol{
+  width:56px;height:56px;margin:0 auto 16px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border-radius:16px;display:flex;align-items:center;justify-content:center;
+  font-size:24px;
+}
+.auth-logo h1{
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;
+  letter-spacing:.02em;
+}
+.auth-logo p{color:var(--muted);font-size:13px;margin-top:4px;}
+
+.auth-tabs{display:flex;background:var(--bg3);border-radius:8px;padding:3px;margin-bottom:28px;}
+.auth-tab{
+  flex:1;padding:8px;text-align:center;border-radius:6px;font-size:13px;
+  cursor:pointer;transition:.2s;color:var(--muted);
+}
+.auth-tab.active{background:var(--card);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3);}
+
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;}
+.field input{
+  width:100%;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;color:var(--text);font-family:inherit;font-size:14px;outline:none;
+  transition:.2s;
+}
+.field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,67,.12);}
+
+.btn-primary{
+  width:100%;padding:13px;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#080C12;border:none;border-radius:8px;font-family:inherit;font-size:14px;
+  font-weight:500;cursor:pointer;letter-spacing:.04em;transition:.2s;
+  margin-top:8px;
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(212,168,67,.35);}
+.btn-primary:active{transform:translateY(0);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+.auth-error{
+  background:rgba(231,76,60,.12);border:1px solid rgba(231,76,60,.3);
+  border-radius:8px;padding:10px 12px;font-size:13px;color:#E74C3C;
+  margin-bottom:16px;display:none;
+}
+
+/* ── MAIN LAYOUT ── */
+#app{display:none;height:100vh;position:relative;z-index:1;}
+.layout{display:flex;height:100vh;}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:240px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;padding:24px 0;
+  position:relative;z-index:10;
+}
+.sidebar-logo{padding:0 24px 28px;border-bottom:1px solid var(--border);}
+.sidebar-logo .sym{
+  width:36px;height:36px;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;margin-bottom:10px;
+}
+.sidebar-logo h2{
+  font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;line-height:1.2;
+}
+.sidebar-logo p{font-size:11px;color:var(--muted);margin-top:2px;}
+
+.nav{flex:1;padding:20px 12px;}
+.nav-section{font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;padding:0 12px;margin:16px 0 6px;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;
+  cursor:pointer;transition:.15s;font-size:13px;color:var(--muted);margin-bottom:2px;
+}
+.nav-item:hover{background:var(--bg3);color:var(--text);}
+.nav-item.active{background:rgba(212,168,67,.12);color:var(--gold);}
+.nav-icon{width:18px;text-align:center;font-size:15px;}
+
+.sidebar-bottom{padding:16px 12px;border-top:1px solid var(--border);}
+.user-pill{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border-radius:8px;background:var(--bg3);
+}
+.user-avatar{
+  width:32px;height:32px;background:linear-gradient(135deg,var(--gold-dim),var(--gold));
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:500;color:#080C12;flex-shrink:0;
+}
+.user-name{font-size:12px;font-weight:500;}
+.user-email{font-size:10px;color:var(--muted);}
+.logout-btn{margin-left:auto;cursor:pointer;font-size:16px;color:var(--muted);background:none;border:none;padding:4px;}
+.logout-btn:hover{color:var(--red);}
+
+/* ── MAIN CONTENT ── */
+.main{flex:1;overflow-y:auto;padding:36px 40px;}
+.main::-webkit-scrollbar{width:4px;}
+.main::-webkit-scrollbar-track{background:transparent;}
+.main::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+/* ── PAGE ── */
+.page{display:none;}
+.page.active{display:block;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.page-header{margin-bottom:32px;}
+.page-header h1{
+  font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;
+  letter-spacing:.01em;
+}
+.page-header p{color:var(--muted);font-size:14px;margin-top:6px;}
+
+/* ── CARDS ── */
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:24px;
+}
+.card-title{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;}
+
+/* ── GRID ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;}
+.span-2{grid-column:span 2;}
+
+/* ── STAT CARD ── */
+.stat-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:20px 24px;
+}
+.stat-label{font-size:11px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;}
+.stat-value{
+  font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;
+  margin:6px 0 4px;line-height:1;
+}
+.stat-sub{font-size:12px;color:var(--muted);}
+.stat-badge{
+  display:inline-flex;align-items:center;gap:4px;padding:3px 8px;
+  border-radius:20px;font-size:11px;font-weight:500;margin-top:8px;
+}
+.badge-green{background:rgba(46,204,113,.12);color:var(--green);}
+.badge-red{background:rgba(231,76,60,.12);color:var(--red);}
+.badge-gold{background:rgba(212,168,67,.12);color:var(--gold);}
+
+/* ── SCORE RING ── */
+.score-container{
+  display:flex;align-items:center;gap:32px;
+}
+.score-ring-wrap{position:relative;width:160px;height:160px;flex-shrink:0;}
+.score-ring-wrap svg{transform:rotate(-90deg);}
+.score-ring-center{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.score-ring-num{
+  font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:600;
+  color:var(--gold);line-height:1;
+}
+.score-ring-label{font-size:11px;color:var(--muted);margin-top:2px;}
+.score-dims{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.dim-item{display:flex;flex-direction:column;gap:4px;}
+.dim-label{font-size:11px;color:var(--muted);}
+.dim-bar-wrap{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;}
+.dim-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width 1s ease;}
+.dim-val{font-size:12px;font-weight:500;}
+
+/* ── FORM ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.form-field{}
+.form-field label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;}
+.form-field input,.form-field select,.form-field textarea{
+  width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;color:var(--text);font-family:inherit;font-size:13px;outline:none;
+  transition:.2s;
+}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{
+  border-color:var(--gold);box-shadow:0 0 0 2px rgba(212,168,67,.1);
+}
+.form-field select option{background:var(--card);}
+.form-field textarea{resize:vertical;min-height:80px;}
+
+.btn-run{
+  display:inline-flex;align-items:center;gap:8px;padding:11px 28px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#080C12;border:none;border-radius:8px;font-family:inherit;font-size:13px;
+  font-weight:500;cursor:pointer;letter-spacing:.04em;transition:.2s;
+}
+.btn-run:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(212,168,67,.3);}
+.btn-run:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.btn-outline{
+  display:inline-flex;align-items:center;gap:8px;padding:10px 20px;
+  background:transparent;border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-family:inherit;font-size:13px;cursor:pointer;transition:.2s;
+}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+
+/* ── RESULT PANEL ── */
+.result-panel{
+  background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);
+  padding:24px;margin-top:20px;display:none;
+}
+.result-panel.show{display:block;animation:fadeIn .3s ease;}
+.result-section{margin-bottom:24px;}
+.result-section:last-child{margin-bottom:0;}
+.result-section h3{
+  font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;
+  margin-bottom:12px;
+}
+.result-section p{font-size:14px;color:var(--muted);line-height:1.7;}
+.insight-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.insight-item{
+  display:flex;gap:10px;align-items:flex-start;padding:10px 12px;
+  background:var(--card);border-radius:8px;border:1px solid var(--border);
+  font-size:13px;line-height:1.5;
+}
+.insight-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--gold);
+  flex-shrink:0;margin-top:5px;
+}
+.action-card{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;margin-bottom:8px;
+}
+.action-card .priority{
+  font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:4px;
+}
+.action-card .text{font-size:13px;line-height:1.5;}
+.action-card .impact{font-size:11px;color:var(--muted);margin-top:4px;}
+
+/* ── LOADING SPINNER ── */
+.spinner{
+  display:inline-block;width:18px;height:18px;border:2px solid rgba(212,168,67,.3);
+  border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── MINI TABLE ── */
+.mini-table{width:100%;border-collapse:collapse;font-size:13px;}
+.mini-table th{
+  text-align:left;font-size:10px;color:var(--muted);letter-spacing:.06em;
+  text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border);
+}
+.mini-table td{padding:10px 12px;border-bottom:1px solid rgba(30,45,69,.5);}
+.mini-table tr:last-child td{border-bottom:none;}
+.mini-table tr:hover td{background:rgba(255,255,255,.02);}
+
+/* ── ALERT ── */
+.alert{
+  padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.alert-info{background:rgba(74,158,255,.1);border:1px solid rgba(74,158,255,.2);color:var(--blue);}
+.alert-success{background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.2);color:var(--green);}
+.alert-error{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.2);color:var(--red);}
+
+/* ── QUICK WINS PILLS ── */
+.pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.pill{
+  padding:5px 12px;background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.2);
+  border-radius:20px;font-size:12px;color:var(--gold);
+}
+
+/* ── REGIME CARD ── */
+.regime-cards{display:flex;gap:16px;margin-bottom:16px;}
+.regime-card{
+  flex:1;padding:16px;background:var(--card);border:2px solid var(--border);
+  border-radius:10px;transition:.2s;
+}
+.regime-card.winner{border-color:var(--gold);background:rgba(212,168,67,.06);}
+.regime-card .r-title{font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;}
+.regime-card .r-amount{
+  font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;
+  color:var(--text);
+}
+.regime-card.winner .r-amount{color:var(--gold);}
+.regime-card .r-label{font-size:11px;color:var(--muted);margin-top:2px;}
+.winner-badge{
+  display:inline-block;padding:2px 8px;background:var(--gold);color:#080C12;
+  border-radius:20px;font-size:10px;font-weight:500;letter-spacing:.05em;margin-top:8px;
+}
+
+/* ── MILESTONE TIMELINE ── */
+.timeline{position:relative;padding-left:24px;}
+.timeline::before{
+  content:'';position:absolute;left:6px;top:6px;bottom:6px;
+  width:1px;background:var(--border);
+}
+.timeline-item{
+  position:relative;margin-bottom:16px;
+}
+.timeline-item::before{
+  content:'';position:absolute;left:-20px;top:5px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--gold);border:2px solid var(--bg3);
+}
+.timeline-item .year{font-size:11px;color:var(--gold);font-weight:500;margin-bottom:2px;}
+.timeline-item .corpus{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;}
+.timeline-item .action{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* ── PROFILE SETUP BANNER ── */
+.setup-banner{
+  background:linear-gradient(135deg,rgba(212,168,67,.08),rgba(74,158,255,.05));
+  border:1px solid rgba(212,168,67,.2);border-radius:var(--r);
+  padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:16px;
+}
+.setup-banner .sb-icon{font-size:28px;}
+.setup-banner h3{font-size:15px;font-weight:500;margin-bottom:2px;}
+.setup-banner p{font-size:13px;color:var(--muted);}
+
+/* ── DASHBOARD METRICS ROW ── */
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+
+/* ── JSON DEBUG ── */
+.json-view{
+  background:var(--bg);border:1px solid var(--border);border-radius:8px;
+  padding:16px;font-family:monospace;font-size:11px;color:var(--muted);
+  max-height:200px;overflow-y:auto;line-height:1.6;display:none;
+}
+
+/* ── SCROLLBAR ── */
+*::-webkit-scrollbar{width:4px;height:4px;}
+*::-webkit-scrollbar-track{background:transparent;}
+*::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="logo-symbol">₹</div>
+      <h1>AI Money Mentor</h1>
+      <p>Your personal CFP — powered by NVIDIA NIM</p>
+    </div>
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchTab('login')">Sign In</div>
+      <div class="auth-tab" onclick="switchTab('register')">Register</div>
+    </div>
+    <div id="auth-error" class="auth-error"></div>
+    <div id="login-form">
+      <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="you@example.com"/></div>
+      <div class="field"><label>Password</label><input type="password" id="login-password" placeholder="••••••••"/></div>
+      <button class="btn-primary" onclick="doLogin()">Sign In →</button>
+    </div>
+    <div id="register-form" style="display:none">
+      <div class="field"><label>Full Name</label><input type="text" id="reg-name" placeholder="Your Name"/></div>
+      <div class="field"><label>Email</label><input type="email" id="reg-email" placeholder="you@example.com"/></div>
+      <div class="field"><label>Password</label><input type="password" id="reg-password" placeholder="Min 8 characters"/></div>
+      <button class="btn-primary" onclick="doRegister()">Create Account →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="sym">₹</div>
+        <h2>AI Money<br>Mentor</h2>
+        <p></p>
+      </div>
+      <nav class="nav">
+        <div class="nav-section">Overview</div>
+        <div class="nav-item active" onclick="showPage('dashboard')">
+          <span class="nav-icon">⬡</span> Dashboard
+        </div>
+        <div class="nav-section">Agents</div>
+        <div class="nav-item" onclick="showPage('health')">
+          <span class="nav-icon">◎</span> Health Score
+        </div>
+        <div class="nav-item" onclick="showPage('fire')">
+          <span class="nav-icon">◈</span> FIRE Planner
+        </div>
+        <div class="nav-item" onclick="showPage('portfolio')">
+          <span class="nav-icon">◇</span> Portfolio X-Ray
+        </div>
+        <div class="nav-item" onclick="showPage('tax')">
+          <span class="nav-icon">◐</span> Tax Wizard
+        </div>
+        <div class="nav-item" onclick="showPage('life')">
+          <span class="nav-icon">◉</span> Life Events
+        </div>
+        <div class="nav-section">Account</div>
+        <div class="nav-item" onclick="showPage('profile')">
+          <span class="nav-icon">○</span> My Profile
+        </div>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="user-pill">
+          <div class="user-avatar" id="user-avatar">U</div>
+          <div>
+            <div class="user-name" id="user-name-display">—</div>
+            <div class="user-email" id="user-email-display">—</div>
+          </div>
+          <button class="logout-btn" onclick="logout()" title="Sign out">⏻</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="main">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <h1>Good morning 👋</h1>
+          <p>Here's your financial intelligence overview</p>
+        </div>
+        <div class="setup-banner" id="setup-banner">
+          <div class="sb-icon">⚡</div>
+          <div>
+            <h3>Set up your financial profile first</h3>
+            <p>Save your income, expenses, and investments once — all agents will use it automatically.</p>
+          </div>
+          <button class="btn-outline" style="margin-left:auto;white-space:nowrap" onclick="showPage('profile')">Set Up →</button>
+        </div>
+        <div class="metrics-row">
+          <div class="stat-card">
+            <div class="stat-label">Health Score</div>
+            <div class="stat-value" style="color:var(--gold)" id="dash-score">—</div>
+            <div class="stat-sub">out of 100</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Monthly Income</div>
+            <div class="stat-value" id="dash-income">—</div>
+            <div class="stat-sub">saved in profile</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Investments</div>
+            <div class="stat-value" id="dash-investments">—</div>
+            <div class="stat-sub">across all instruments</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Savings Rate</div>
+            <div class="stat-value" id="dash-savings-rate">—</div>
+            <div class="stat-sub">of monthly income</div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Quick Actions</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <button class="btn-outline" style="justify-content:flex-start" onclick="showPage('health')">◎ &nbsp;Get Health Score in 30 seconds</button>
+              <button class="btn-outline" style="justify-content:flex-start" onclick="showPage('fire')">◈ &nbsp;Plan my FIRE journey</button>
+              <button class="btn-outline" style="justify-content:flex-start" onclick="showPage('tax')">◐ &nbsp;Old vs New tax regime</button>
+              <button class="btn-outline" style="justify-content:flex-start" onclick="showPage('portfolio')">◇ &nbsp;Analyse my MF portfolio</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">About This App</div>
+            <p style="font-size:13px;color:var(--muted);line-height:1.7">
+              AI Money Mentor gives every Indian investor access to a CFA-grade financial advisor — for free. Five AI agents combine deterministic financial math with NVIDIA NIM's reasoning to deliver advice that used to cost ₹25,000/year.
+            </p>
+            <div class="pill-row" style="margin-top:16px">
+              <span class="pill">NVIDIA NIM</span>
+              <span class="pill">FastAPI</span>
+              <span class="pill">SQLite</span>
+              <span class="pill">India Tax 2024-25</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HEALTH SCORE -->
+      <div class="page" id="page-health">
+        <div class="page-header">
+          <h1>Money Health Score</h1>
+          <p>6-dimension financial wellness score with actionable fixes</p>
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-title">Your Financial Snapshot</div>
+          <div class="form-grid">
+            <div class="form-field"><label>Monthly Income (₹)</label><input type="number" id="hs-income" placeholder="e.g. 150000"/></div>
+            <div class="form-field"><label>Monthly Expenses (₹)</label><input type="number" id="hs-expenses" placeholder="e.g. 80000"/></div>
+            <div class="form-field"><label>Emergency Fund (₹)</label><input type="number" id="hs-emergency" placeholder="e.g. 300000"/></div>
+            <div class="form-field"><label>Monthly Investment (₹)</label><input type="number" id="hs-investment" placeholder="e.g. 20000"/></div>
+            <div class="form-field"><label>Life Cover (₹)</label><input type="number" id="hs-life" placeholder="e.g. 10000000"/></div>
+            <div class="form-field"><label>Health Cover (₹)</label><input type="number" id="hs-health" placeholder="e.g. 500000"/></div>
+            <div class="form-field"><label>Monthly EMI (₹)</label><input type="number" id="hs-emi" placeholder="e.g. 15000"/></div>
+            <div class="form-field"><label>Age</label><input type="number" id="hs-age" placeholder="e.g. 32"/></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <button class="btn-run" id="hs-btn" onclick="runHealthScore()">
+              <span class="spinner" id="hs-spinner" style="display:none"></span>
+              ◎ &nbsp;Analyse Now
+            </button>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer">
+              <input type="checkbox" id="hs-term" style="accent-color:var(--gold)"/> Has term plan
+            </label>
+          </div>
+        </div>
+        <div class="result-panel" id="hs-result">
+          <div class="result-section">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+              <h3>Financial Health Score</h3>
+              <div class="stat-badge badge-gold" id="hs-grade-badge">Grade —</div>
+            </div>
+            <div class="score-container">
+              <div class="score-ring-wrap">
+                <svg width="160" height="160" viewBox="0 0 160 160">
+                  <circle cx="80" cy="80" r="68" fill="none" stroke="#1E2D45" stroke-width="10"/>
+                  <circle id="hs-ring" cx="80" cy="80" r="68" fill="none" stroke="url(#goldGrad)" stroke-width="10"
+                    stroke-linecap="round" stroke-dasharray="427" stroke-dashoffset="427" style="transition:stroke-dashoffset 1.2s ease"/>
+                  <defs>
+                    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#D4A843"/>
+                      <stop offset="100%" stop-color="#F0C060"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="score-ring-center">
+                  <div class="score-ring-num" id="hs-score-num">0</div>
+                  <div class="score-ring-label">/ 100</div>
+                </div>
+              </div>
+              <div class="score-dims" id="hs-dims"></div>
+            </div>
+          </div>
+          <div class="result-section">
+            <h3>Overall Assessment</h3>
+            <p id="hs-assessment"></p>
+          </div>
+          <div class="result-section">
+            <h3>Priority Actions</h3>
+            <div id="hs-actions"></div>
+          </div>
+          <div class="result-section">
+            <h3>Quick Wins</h3>
+            <div class="pill-row" id="hs-wins"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FIRE PLANNER -->
+      <div class="page" id="page-fire">
+        <div class="page-header">
+          <h1>FIRE Planner</h1>
+          <p>Month-by-month roadmap to Financial Independence, Retire Early</p>
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-title">Your FIRE Parameters</div>
+          <div class="form-grid">
+            <div class="form-field"><label>Current Age</label><input type="number" id="fp-age" placeholder="e.g. 30"/></div>
+            <div class="form-field"><label>Target FIRE Age</label><input type="number" id="fp-retire" placeholder="e.g. 45"/></div>
+            <div class="form-field"><label>Monthly Income (₹)</label><input type="number" id="fp-income" placeholder="e.g. 200000"/></div>
+            <div class="form-field"><label>Monthly Expenses (₹)</label><input type="number" id="fp-expenses" placeholder="e.g. 100000"/></div>
+            <div class="form-field"><label>Existing Investments (₹)</label><input type="number" id="fp-corpus" placeholder="e.g. 1000000"/></div>
+            <div class="form-field">
+              <label>Risk Profile</label>
+              <select id="fp-risk">
+                <option value="conservative">Conservative</option>
+                <option value="moderate" selected>Moderate</option>
+                <option value="aggressive">Aggressive</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field" style="margin-bottom:16px">
+            <label>Life Goals (optional)</label>
+            <textarea id="fp-goals" placeholder="e.g. Travel Europe, fund children's education, start a business..."></textarea>
+          </div>
+          <button class="btn-run" id="fp-btn" onclick="runFIRE()">
+            <span class="spinner" id="fp-spinner" style="display:none"></span>
+            ◈ &nbsp;Build My FIRE Plan
+          </button>
+        </div>
+        <div class="result-panel" id="fp-result">
+          <div class="grid-2" style="margin-bottom:24px" id="fp-summary-grid"></div>
+          <div class="result-section">
+            <h3>SIP Breakdown</h3>
+            <table class="mini-table" id="fp-sip-table">
+              <thead><tr><th>Fund Category</th><th>Monthly (₹)</th><th>Tax Benefit</th><th>Rationale</th></tr></thead>
+              <tbody id="fp-sip-body"></tbody>
+            </table>
+          </div>
+          <div class="result-section">
+            <h3>Milestones</h3>
+            <div class="timeline" id="fp-timeline"></div>
+          </div>
+          <div class="result-section">
+            <h3>Asset Allocation</h3>
+            <div class="grid-3" id="fp-alloc"></div>
+          </div>
+          <div class="result-section">
+            <h3>Key Risks</h3>
+            <div id="fp-risks"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PORTFOLIO X-RAY -->
+      <div class="page" id="page-portfolio">
+        <div class="page-header">
+          <h1>Portfolio X-Ray</h1>
+          <p>XIRR, overlap analysis, expense drag, and rebalancing plan</p>
+        </div>
+        <div class="alert alert-info">
+          ℹ &nbsp;Paste your CAMS consolidated statement text below. Download it from camsonline.com → Statements → Consolidated.
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-title">CAMS Statement</div>
+          <div class="form-field" style="margin-bottom:16px">
+            <textarea id="px-cams" rows="8" placeholder="Paste your CAMS statement text here...
+
+Example:
+Axis Bluechip Fund - Regular Plan - Growth
+ISIN: INF846K01DP8
+Units: 1234.567  |  NAV: ₹52.34  |  Current Value: ₹64,628
+Invested: ₹48,000  |  Gain/Loss: ₹16,628 (34.64%)"></textarea>
+          </div>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            <button class="btn-run" id="px-btn" onclick="runXRay()">
+              <span class="spinner" id="px-spinner" style="display:none"></span>
+              ◇ &nbsp;Analyse Portfolio
+            </button>
+            <button class="btn-outline" onclick="loadSampleCAMS()">Load Sample Data</button>
+          </div>
+        </div>
+        <div class="result-panel" id="px-result">
+          <div class="metrics-row" id="px-metrics" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px"></div>
+          <div class="grid-2" style="margin-bottom:24px">
+            <div class="result-section">
+              <h3>Fund Ratings</h3>
+              <div id="px-ratings"></div>
+            </div>
+            <div class="result-section">
+              <h3>Rebalancing Plan</h3>
+              <p id="px-rebal-action" style="font-size:13px;color:var(--muted);margin-bottom:12px"></p>
+              <div id="px-rebal-steps"></div>
+            </div>
+          </div>
+          <div class="result-section">
+            <h3>Top Insights</h3>
+            <ul class="insight-list" id="px-insights"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAX WIZARD -->
+      <div class="page" id="page-tax">
+        <div class="page-header">
+          <h1>Tax Wizard</h1>
+          <p>FY 2024-25 — Old vs New regime + deduction gap analysis</p>
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-title">Income & Deductions</div>
+          <div class="form-grid">
+            <div class="form-field"><label>Annual Income (₹)</label><input type="number" id="tw-income" placeholder="e.g. 1200000"/></div>
+            <div class="form-field"><label>Basic Salary Annual (₹)</label><input type="number" id="tw-basic" placeholder="e.g. 600000"/></div>
+            <div class="form-field"><label>HRA Received Annual (₹)</label><input type="number" id="tw-hra" placeholder="e.g. 300000"/></div>
+            <div class="form-field"><label>Rent Paid Annual (₹)</label><input type="number" id="tw-rent" placeholder="e.g. 240000"/></div>
+            <div class="form-field"><label>Section 80C Used (₹)</label><input type="number" id="tw-80c" placeholder="Max 1,50,000"/></div>
+            <div class="form-field"><label>NPS 80CCD(1B) (₹)</label><input type="number" id="tw-nps" placeholder="Max 50,000"/></div>
+            <div class="form-field"><label>Home Loan Interest (₹)</label><input type="number" id="tw-home" placeholder="Max 2,00,000"/></div>
+            <div class="form-field">
+              <label>City</label>
+              <select id="tw-metro">
+                <option value="true">Metro (Delhi/Mumbai/Chennai/Kolkata)</option>
+                <option value="false">Non-Metro</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-run" id="tw-btn" onclick="runTax()">
+            <span class="spinner" id="tw-spinner" style="display:none"></span>
+            ◐ &nbsp;Calculate Tax
+          </button>
+        </div>
+        <div class="result-panel" id="tw-result">
+          <div class="result-section">
+            <h3>Regime Comparison</h3>
+            <div class="regime-cards" id="tw-regimes"></div>
+            <div class="alert alert-success" id="tw-recommendation"></div>
+          </div>
+          <div class="result-section">
+            <h3>Deduction Gaps — Money Left on Table</h3>
+            <table class="mini-table">
+              <thead><tr><th>Section</th><th>Max Allowed</th><th>Used</th><th>Gap</th><th>Tax Saved If Filled</th></tr></thead>
+              <tbody id="tw-gaps"></tbody>
+            </table>
+          </div>
+          <div class="result-section">
+            <h3>Tax Saving Action Plan</h3>
+            <div id="tw-actions"></div>
+          </div>
+          <div class="result-section" id="tw-advance-section">
+            <h3>Advance Tax Schedule</h3>
+            <table class="mini-table">
+              <thead><tr><th>Quarter</th><th>Due Date</th><th>Amount Due</th></tr></thead>
+              <tbody id="tw-advance"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIFE EVENTS -->
+      <div class="page" id="page-life">
+        <div class="page-header">
+          <h1>Life Event Advisor</h1>
+          <p>Financial action plan tailored to your life moment</p>
+        </div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-title">What's Happening?</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label>Life Event</label>
+              <select id="le-event" onchange="updateEventFields()">
+                <option value="bonus">🎉 Received a Bonus</option>
+                <option value="inheritance">💰 Inheritance / Windfall</option>
+                <option value="marriage">💍 Getting Married</option>
+                <option value="new_baby">👶 New Baby</option>
+                <option value="job_change">💼 Job Change / Hike</option>
+                <option value="home_purchase">🏠 Buying a Home</option>
+                <option value="retirement">🌅 Approaching Retirement</option>
+                <option value="medical_emergency">🏥 Medical Emergency</option>
+              </select>
+            </div>
+            <div class="form-field" id="le-amount-wrap">
+              <label id="le-amount-label">Event Amount (₹)</label>
+              <input type="number" id="le-amount" placeholder="e.g. 500000"/>
+            </div>
+            <div class="form-field"><label>Monthly Income (₹)</label><input type="number" id="le-income" placeholder="e.g. 150000"/></div>
+            <div class="form-field"><label>Monthly Expenses (₹)</label><input type="number" id="le-expenses" placeholder="e.g. 80000"/></div>
+            <div class="form-field"><label>Age</label><input type="number" id="le-age" placeholder="e.g. 32"/></div>
+            <div class="form-field" id="le-home-wrap" style="display:none">
+              <label>Home Value (₹)</label>
+              <input type="number" id="le-home-value" placeholder="e.g. 8000000"/>
+            </div>
+          </div>
+          <div class="form-field" style="margin-bottom:16px">
+            <label>Additional Context</label>
+            <textarea id="le-context" placeholder="Any extra details... (optional)"></textarea>
+          </div>
+          <button class="btn-run" id="le-btn" onclick="runLifeEvent()">
+            <span class="spinner" id="le-spinner" style="display:none"></span>
+            ◉ &nbsp;Get Action Plan
+          </button>
+        </div>
+        <div class="result-panel" id="le-result">
+          <div class="result-section">
+            <h3>Event Summary</h3>
+            <p id="le-summary" style="font-size:14px;color:var(--muted);line-height:1.7"></p>
+          </div>
+          <div class="result-section">
+            <h3>Immediate Actions</h3>
+            <div id="le-actions"></div>
+          </div>
+          <div class="result-section" id="le-alloc-section" style="display:none">
+            <h3>Fund Allocation Plan</h3>
+            <table class="mini-table">
+              <thead><tr><th>Bucket</th><th>Amount (₹)</th><th>%</th><th>Instrument</th><th>Why</th></tr></thead>
+              <tbody id="le-alloc-body"></tbody>
+            </table>
+          </div>
+          <div class="result-section">
+            <h3>30-Day Checklist</h3>
+            <ul class="insight-list" id="le-checklist"></ul>
+          </div>
+          <div class="result-section">
+            <h3>Risks to Avoid</h3>
+            <div class="pill-row" id="le-risks"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="page" id="page-profile">
+        <div class="page-header">
+          <h1>My Financial Profile</h1>
+          <p>Save once — all agents use this automatically</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">Personal & Income</div>
+            <div class="form-field" style="margin-bottom:12px"><label>Age</label><input type="number" id="pr-age" placeholder="30"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>City</label><input type="text" id="pr-city" placeholder="Mumbai"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>Monthly Income (₹)</label><input type="number" id="pr-income" placeholder="150000"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>Monthly Expenses (₹)</label><input type="number" id="pr-expenses" placeholder="80000"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>Annual Bonus (₹)</label><input type="number" id="pr-bonus" placeholder="0"/></div>
+            <div class="form-field" style="margin-bottom:12px">
+              <label>Risk Profile</label>
+              <select id="pr-risk">
+                <option value="conservative">Conservative</option>
+                <option value="moderate" selected>Moderate</option>
+                <option value="aggressive">Aggressive</option>
+              </select>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Existing Investments (₹)</div>
+            <div class="form-field" style="margin-bottom:12px"><label>Mutual Funds</label><input type="number" id="pr-mf" placeholder="0"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>Stocks / Equity</label><input type="number" id="pr-stocks" placeholder="0"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>PPF</label><input type="number" id="pr-ppf" placeholder="0"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>NPS</label><input type="number" id="pr-nps" placeholder="0"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>FD / Liquid</label><input type="number" id="pr-fd" placeholder="0"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>Real Estate</label><input type="number" id="pr-re" placeholder="0"/></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Liabilities (₹ Outstanding)</div>
+            <div class="form-field" style="margin-bottom:12px"><label>Home Loan</label><input type="number" id="pr-homeloan" placeholder="0"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>Car Loan</label><input type="number" id="pr-carloan" placeholder="0"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>Personal Loan</label><input type="number" id="pr-personal" placeholder="0"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>Credit Card Debt</label><input type="number" id="pr-cc" placeholder="0"/></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Insurance & Tax</div>
+            <div class="form-field" style="margin-bottom:12px"><label>Life Cover (₹)</label><input type="number" id="pr-life" placeholder="0"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>Health Cover (₹)</label><input type="number" id="pr-health" placeholder="0"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>80C Used (₹)</label><input type="number" id="pr-80c" placeholder="0"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>NPS Contribution (₹)</label><input type="number" id="pr-npsc" placeholder="0"/></div>
+            <div class="form-field" style="margin-bottom:12px"><label>Target Retirement Age</label><input type="number" id="pr-retage" placeholder="60"/></div>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-top:4px">
+              <input type="checkbox" id="pr-term" style="accent-color:var(--gold)"/> Has Term Insurance Plan
+            </label>
+          </div>
+        </div>
+        <div style="margin-top:20px;display:flex;gap:12px">
+          <button class="btn-run" onclick="saveProfile()">
+            <span class="spinner" id="pr-spinner" style="display:none"></span>
+            Save Profile
+          </button>
+          <button class="btn-outline" onclick="loadProfile()">Reload Saved Data</button>
+        </div>
+        <div id="pr-msg" style="margin-top:12px;display:none"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+const API = 'http://127.0.0.1:8080/api/v1';
+let TOKEN = localStorage.getItem('mm_token') || '';
+let USER  = JSON.parse(localStorage.getItem('mm_user') || 'null');
+
+/* ── Boot ── */
+window.onload = () => {
+  if (TOKEN && USER) {
+    showApp();
+  }
+};
+
+/* ── Auth Tabs ── */
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+  document.getElementById('login-form').style.display   = tab==='login'   ? '' : 'none';
+  document.getElementById('register-form').style.display = tab==='register' ? '' : 'none';
+  document.getElementById('auth-error').style.display = 'none';
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg; el.style.display = 'flex';
+}
+
+async function doLogin() {
+  const btn = document.querySelector('#login-form .btn-primary');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  try {
+    const r = await api('/auth/login','POST',{
+      email: document.getElementById('login-email').value,
+      password: document.getElementById('login-password').value
+    }, false);
+    if (r.access_token) { TOKEN=r.access_token; USER=r.user; persist(); showApp(); }
+    else showAuthError(r.detail || 'Login failed');
+  } catch(e){ showAuthError(e.message); }
+  btn.disabled = false; btn.textContent = 'Sign In →';
+}
+
+async function doRegister() {
+  const btn = document.querySelector('#register-form .btn-primary');
+  btn.disabled = true; btn.textContent = 'Creating…';
+  try {
+    const r = await api('/auth/register','POST',{
+      email: document.getElementById('reg-email').value,
+      password: document.getElementById('reg-password').value,
+      full_name: document.getElementById('reg-name').value
+    }, false);
+    if (r.access_token) { TOKEN=r.access_token; USER=r.user; persist(); showApp(); }
+    else showAuthError(r.detail || 'Registration failed');
+  } catch(e){ showAuthError(e.message); }
+  btn.disabled = false; btn.textContent = 'Create Account →';
+}
+
+function persist() {
+  localStorage.setItem('mm_token', TOKEN);
+  localStorage.setItem('mm_user', JSON.stringify(USER));
+}
+
+function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  const name = USER?.full_name || USER?.email?.split('@')[0] || 'User';
+  document.getElementById('user-name-display').textContent = name;
+  document.getElementById('user-email-display').textContent = USER?.email || '';
+  document.getElementById('user-avatar').textContent = name[0].toUpperCase();
+  document.querySelector('.page-header h1').textContent = `Good ${getGreeting()}, ${name.split(' ')[0]} 👋`;
+  loadProfile();
+}
+
+function getGreeting(){const h=new Date().getHours();return h<12?'morning':h<17?'afternoon':'evening';}
+
+function logout() {
+  TOKEN=''; USER=null;
+  localStorage.removeItem('mm_token'); localStorage.removeItem('mm_user');
+  document.getElementById('auth-screen').style.display='flex';
+  document.getElementById('app').style.display='none';
+}
+
+/* ── Navigation ── */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.textContent.toLowerCase().includes(id==='dashboard'?'dashboard':id==='health'?'health':id==='fire'?'fire':id==='portfolio'?'portfolio':id==='tax'?'tax':id==='life'?'life':id==='profile'?'profile':'__')) n.classList.add('active');
+  });
+  // fix nav highlighting
+  const map={dashboard:0,health:1,fire:2,portfolio:3,tax:4,life:5,profile:6};
+  const items=document.querySelectorAll('.nav-item');
+  items.forEach(i=>i.classList.remove('active'));
+  const idx=[0,2,3,4,5,6,8]; // indices in nav-item list
+  const pageIdx={dashboard:0,health:1,fire:2,portfolio:3,tax:4,life:5,profile:6};
+  if(pageIdx[id]!==undefined) items[idx[pageIdx[id]]]?.classList.add('active');
+}
+
+/* ── API helper ── */
+async function api(path, method='GET', body=null, auth=true) {
+  const headers = {'Content-Type':'application/json'};
+  if (auth) headers['Authorization'] = 'Bearer '+TOKEN;
+  const opts = {method, headers};
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API+path, opts);
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.detail || data.error || 'Request failed ('+r.status+')');
+  return data;
+}
+
+function setLoading(btnId, spinnerId, loading) {
+  document.getElementById(btnId).disabled = loading;
+  document.getElementById(spinnerId).style.display = loading ? 'inline-block' : 'none';
+}
+
+/* ── FORMAT helpers ── */
+function inr(n) {
+  if (!n && n!==0) return '—';
+  n = parseFloat(n);
+  if (n>=10000000) return '₹'+(n/10000000).toFixed(2)+' Cr';
+  if (n>=100000)   return '₹'+(n/100000).toFixed(2)+' L';
+  return '₹'+n.toLocaleString('en-IN');
+}
+
+function pct(n) { return n!=null ? n.toFixed(1)+'%' : '—'; }
+
+/* ═══════════════════════════════════════════════
+   HEALTH SCORE
+═══════════════════════════════════════════════ */
+async function runHealthScore() {
+  setLoading('hs-btn','hs-spinner',true);
+  try {
+    const payload = {
+      monthly_income:    +document.getElementById('hs-income').value || null,
+      monthly_expenses:  +document.getElementById('hs-expenses').value || null,
+      emergency_fund:    +document.getElementById('hs-emergency').value || 0,
+      monthly_investment:+document.getElementById('hs-investment').value || 0,
+      life_cover:        +document.getElementById('hs-life').value || 0,
+      health_cover:      +document.getElementById('hs-health').value || 0,
+      debt_emi:          +document.getElementById('hs-emi').value || 0,
+      age:               +document.getElementById('hs-age').value || null,
+      has_term_plan:     document.getElementById('hs-term').checked,
+    };
+    const res = await api('/agents/health-score','POST', payload);
+    renderHealthScore(res.data);
+  } catch(e) { alert('Error: '+e.message); }
+  setLoading('hs-btn','hs-spinner',false);
+}
+
+function renderHealthScore(d) {
+  const panel = document.getElementById('hs-result');
+  panel.classList.add('show');
+
+  // Animate ring
+  const score = d.total_score || 0;
+  const circ = 2*Math.PI*68;
+  const offset = circ*(1 - score/100);
+  document.getElementById('hs-ring').style.strokeDashoffset = offset;
+
+  // Animate counter
+  let cur = 0;
+  const target = Math.round(score);
+  const timer = setInterval(()=>{
+    cur = Math.min(cur+2, target);
+    document.getElementById('hs-score-num').textContent = cur;
+    if(cur>=target) clearInterval(timer);
+  },16);
+
+  document.getElementById('hs-grade-badge').textContent = 'Grade '+d.grade;
+
+  // Dimension bars
+  const dims = d.dimensions || {};
+  const dimLabels = {emergency:'Emergency Fund',insurance:'Insurance',investment:'Investment',debt:'Debt Health',tax_efficiency:'Tax Efficiency',retirement:'Retirement'};
+  document.getElementById('hs-dims').innerHTML = Object.entries(dims).map(([k,v])=>`
+    <div class="dim-item">
+      <div class="dim-label">${dimLabels[k]||k}</div>
+      <div class="dim-bar-wrap"><div class="dim-bar" style="width:${v}%"></div></div>
+      <div class="dim-val">${v.toFixed(0)}/100</div>
+    </div>`).join('');
+
+  document.getElementById('hs-assessment').textContent = d.overall_assessment || '—';
+
+  // Priority actions
+  const actions = d.priority_actions || [];
+  document.getElementById('hs-actions').innerHTML = actions.map(a=>`
+    <div class="action-card">
+      <div class="priority">Priority ${a.rank} · ${a.urgency?.toUpperCase()}</div>
+      <div class="text">${a.action}</div>
+      <div class="impact">💰 Impact: ${a.monthly_impact||'—'}</div>
+    </div>`).join('');
+
+  // Quick wins
+  const wins = d.quick_wins || [];
+  document.getElementById('hs-wins').innerHTML = wins.map(w=>`<span class="pill">${w}</span>`).join('');
+
+  // Update dashboard score
+  document.getElementById('dash-score').textContent = Math.round(score);
+
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ═══════════════════════════════════════════════
+   FIRE PLANNER
+═══════════════════════════════════════════════ */
+async function runFIRE() {
+  setLoading('fp-btn','fp-spinner',true);
+  try {
+    const payload = {
+      age:                   +document.getElementById('fp-age').value || null,
+      target_retirement_age: +document.getElementById('fp-retire').value || 45,
+      monthly_income:        +document.getElementById('fp-income').value || null,
+      monthly_expenses:      +document.getElementById('fp-expenses').value || null,
+      existing_corpus:       +document.getElementById('fp-corpus').value || 0,
+      risk_profile:          document.getElementById('fp-risk').value,
+      life_goals:            document.getElementById('fp-goals').value,
+    };
+    const res = await api('/agents/fire-planner','POST', payload);
+    renderFIRE(res.data);
+  } catch(e) { alert('Error: '+e.message); }
+  setLoading('fp-btn','fp-spinner',false);
+}
+
+function renderFIRE(d) {
+  const panel = document.getElementById('fp-result');
+  panel.classList.add('show');
+
+  const s = d.fire_summary || {};
+  document.getElementById('fp-summary-grid').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Corpus Needed</div><div class="stat-value" style="color:var(--gold)">${inr(s.corpus_needed)}</div><div class="stat-sub">at retirement</div></div>
+    <div class="stat-card"><div class="stat-label">Years to FIRE</div><div class="stat-value">${s.years_to_fire||'—'}</div><div class="stat-sub">FIRE year: ${s.fire_date||'—'}</div></div>
+    <div class="stat-card"><div class="stat-label">Monthly SIP Required</div><div class="stat-value" style="color:var(--green)">${inr(s.monthly_sip_required)}</div><div class="stat-sub">/month @ 12%</div></div>
+    <div class="stat-card"><div class="stat-label">Current Gap</div><div class="stat-value" style="color:var(--red)">${inr(s.current_gap_per_month)}</div><div class="stat-sub">to bridge monthly</div></div>`;
+
+  // SIP table
+  const sips = d.sip_breakdown || [];
+  document.getElementById('fp-sip-body').innerHTML = sips.map(s=>`
+    <tr><td><strong>${s.category}</strong></td><td>${inr(s.monthly_amount)}</td><td><span class="stat-badge badge-gold" style="font-size:10px">${s.tax_benefit||'—'}</span></td><td style="color:var(--muted)">${s.rationale||''}</td></tr>`).join('');
+
+  // Milestones
+  const ms = d.milestones || [];
+  document.getElementById('fp-timeline').innerHTML = ms.map(m=>`
+    <div class="timeline-item">
+      <div class="year">${m.year} · Age ${m.age}</div>
+      <div class="corpus">${inr(m.target_corpus)}</div>
+      <div class="action">${m.key_action||''}</div>
+    </div>`).join('');
+
+  // Asset allocation
+  const alloc = d.asset_allocation || {};
+  const phases = [{key:'current_phase',label:'Now'},{key:'5_years_out',label:'In 5 Years'},{key:'at_retirement',label:'At Retirement'}];
+  document.getElementById('fp-alloc').innerHTML = phases.map(p=>{
+    const a = alloc[p.key] || {};
+    return `<div class="stat-card">
+      <div class="stat-label">${p.label}</div>
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px">
+        ${[['Equity',a.equity,'var(--green)'],['Debt',a.debt,'var(--blue)'],['Gold',a.gold,'var(--gold)']].map(([l,v,c])=>`
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span style="color:var(--muted)">${l}</span>
+          <span style="color:${c};font-weight:500">${v||0}%</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Risks
+  const risks = d.risks || [];
+  document.getElementById('fp-risks').innerHTML = risks.map(r=>`
+    <div class="action-card">
+      <div class="priority">⚠ Risk</div>
+      <div class="text">${r.risk}</div>
+      <div class="impact">🛡 ${r.mitigation}</div>
+    </div>`).join('');
+
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ═══════════════════════════════════════════════
+   PORTFOLIO X-RAY
+═══════════════════════════════════════════════ */
+function loadSampleCAMS() {
+  document.getElementById('px-cams').value = `Axis Bluechip Fund - Regular Plan - Growth
+ISIN: INF846K01DP8
+Units: 1234.567  |  NAV: ₹52.34  |  Current Value: ₹64,628
+Invested: ₹48,000  |  Gain/Loss: ₹16,628 (34.64%)
+
+Mirae Asset Large Cap Fund - Regular Plan - Growth
+ISIN: INF769K01EN2
+Units: 876.432  |  NAV: ₹94.12  |  Current Value: ₹82,493
+Invested: ₹60,000  |  Gain/Loss: ₹22,493 (37.49%)
+
+Parag Parikh Flexi Cap Fund - Regular Plan - Growth
+ISIN: INF879O01019
+Units: 543.210  |  NAV: ₹68.45  |  Current Value: ₹37,184
+Invested: ₹25,000  |  Gain/Loss: ₹12,184 (48.74%)
+
+HDFC Mid-Cap Opportunities Fund - Growth
+ISIN: INF179K01VW3
+Units: 321.098  |  NAV: ₹142.67  |  Current Value: ₹45,822
+Invested: ₹30,000  |  Gain/Loss: ₹15,822 (52.74%)
+
+Quant Small Cap Fund - Growth
+ISIN: INF966L01131
+Units: 189.456  |  NAV: ₹236.80  |  Current Value: ₹44,844
+Invested: ₹20,000  |  Gain/Loss: ₹24,844 (124.22%)
+
+Mirae Asset Tax Saver Fund (ELSS)
+ISIN: INF769K01DM1
+Units: 456.789  |  NAV: ₹36.21  |  Current Value: ₹16,541
+Invested: ₹12,000  |  Gain/Loss: ₹4,541 (37.84%)
+
+SBI Nifty Index Fund - Regular Plan - Growth
+ISIN: INF200K01804
+Units: 2345.678  |  NAV: ₹22.15  |  Current Value: ₹51,957
+Invested: ₹40,000  |  Gain/Loss: ₹11,957 (29.89%)`;
+}
+
+async function runXRay() {
+  const text = document.getElementById('px-cams').value.trim();
+  if (!text) { alert('Please paste your CAMS statement or click "Load Sample Data"'); return; }
+  setLoading('px-btn','px-spinner',true);
+  try {
+    const res = await api('/agents/portfolio-xray','POST',{cams_text:text});
+    renderXRay(res.data);
+  } catch(e) { alert('Error: '+e.message); }
+  setLoading('px-btn','px-spinner',false);
+}
+
+function renderXRay(d) {
+  const panel = document.getElementById('px-result');
+  panel.classList.add('show');
+
+  const s = d.summary || {};
+  const h = d.health_signals || {};
+
+  document.getElementById('px-metrics').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total Invested</div><div class="stat-value">${inr(s.total_invested)}</div></div>
+    <div class="stat-card"><div class="stat-label">Current Value</div><div class="stat-value" style="color:var(--green)">${inr(s.total_current_value)}</div></div>
+    <div class="stat-card"><div class="stat-label">Gain</div><div class="stat-value" style="color:var(--green)">${inr(s.absolute_gain)}</div><div class="stat-sub">${pct(s.gain_pct)} returns</div></div>
+    <div class="stat-card"><div class="stat-label">XIRR</div><div class="stat-value" style="color:var(--gold)">${d.portfolio_summary?.xirr != null ? pct(d.portfolio_summary.xirr) : pct(d.xirr)}</div><div class="stat-sub">annualised</div></div>`;
+
+  // Fund ratings
+  const ratings = d.fund_ratings || [];
+  const verdictColor = {keep:'var(--green)',review:'var(--gold)',exit:'var(--red)'};
+  document.getElementById('px-ratings').innerHTML = ratings.map(r=>`
+    <div class="action-card" style="border-left:3px solid ${verdictColor[r.verdict]||'var(--border)'}">
+      <div class="priority" style="color:${verdictColor[r.verdict]}">${r.verdict?.toUpperCase()}</div>
+      <div class="text">${r.fund_name}</div>
+      <div class="impact">${r.reason} ${r.action?'→ '+r.action:''}</div>
+    </div>`).join('');
+
+  // Rebalancing
+  const rb = d.rebalancing_plan || {};
+  document.getElementById('px-rebal-action').textContent = rb.overall_action || '';
+  document.getElementById('px-rebal-steps').innerHTML = (rb.steps||[]).map(s=>`
+    <div class="insight-item"><div class="insight-dot"></div>${s}</div>`).join('');
+
+  // Insights
+  document.getElementById('px-insights').innerHTML = (d.top_insights||[]).map(i=>`
+    <li class="insight-item"><div class="insight-dot"></div>${i}</li>`).join('');
+
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ═══════════════════════════════════════════════
+   TAX WIZARD
+═══════════════════════════════════════════════ */
+async function runTax() {
+  setLoading('tw-btn','tw-spinner',true);
+  try {
+    const payload = {
+      annual_income:       +document.getElementById('tw-income').value || null,
+      basic_salary_annual: +document.getElementById('tw-basic').value || null,
+      hra_received_annual: +document.getElementById('tw-hra').value || null,
+      rent_paid_annual:    +document.getElementById('tw-rent').value || null,
+      section_80c_used:    +document.getElementById('tw-80c').value || 0,
+      nps_contribution:    +document.getElementById('tw-nps').value || 0,
+      home_loan_interest:  +document.getElementById('tw-home').value || 0,
+      is_metro_city:       document.getElementById('tw-metro').value === 'true',
+    };
+    const res = await api('/agents/tax-wizard','POST', payload);
+    renderTax(res.data);
+  } catch(e) { alert('Error: '+e.message); }
+  setLoading('tw-btn','tw-spinner',false);
+}
+
+function renderTax(d) {
+  const panel = document.getElementById('tw-result');
+  panel.classList.add('show');
+
+  const rc = d.regime_comparison || {};
+  const old = rc.old_regime || d.comparison?.old_regime || {};
+  const nw  = rc.new_regime || d.comparison?.new_regime || {};
+  const rec = rc.recommended || d.comparison?.recommendation || 'new_regime';
+  const saving = rc.savings_with_recommended || Math.abs(d.comparison?.saving_with_old||0);
+
+  document.getElementById('tw-regimes').innerHTML = `
+    <div class="regime-card ${rec==='old_regime'?'winner':''}">
+      <div class="r-title">Old Regime</div>
+      <div class="r-amount">${inr(old.total_tax||rc.old_tax)}</div>
+      <div class="r-label">Total Tax · ${pct(old.effective_rate)} effective</div>
+      ${rec==='old_regime'?'<span class="winner-badge">RECOMMENDED ✓</span>':''}
+    </div>
+    <div class="regime-card ${rec==='new_regime'?'winner':''}">
+      <div class="r-title">New Regime</div>
+      <div class="r-amount">${inr(nw.total_tax||rc.new_tax)}</div>
+      <div class="r-label">Total Tax · ${pct(nw.effective_rate)} effective</div>
+      ${rec==='new_regime'?'<span class="winner-badge">RECOMMENDED ✓</span>':''}
+    </div>`;
+
+  document.getElementById('tw-recommendation').innerHTML =
+    `✅ Go with <strong>${rec==='old_regime'?'Old':'New'} Regime</strong> — saves you <strong>${inr(saving)}/year</strong>. ${rc.reason||d.comparison?.reason||''}`;
+
+  // Deduction gaps
+  const gaps = d.deduction_gaps || [];
+  document.getElementById('tw-gaps').innerHTML = gaps.map(g=>`
+    <tr>
+      <td><strong>${g.section}</strong></td>
+      <td>${inr(g.max_allowed)}</td>
+      <td>${inr(g.currently_used)}</td>
+      <td style="color:var(--red)">${inr(g.gap)}</td>
+      <td style="color:var(--green)">${inr(g.potential_saving)}</td>
+    </tr>`).join('');
+
+  // Tax saving plan
+  const plan = d.tax_saving_plan || [];
+  document.getElementById('tw-actions').innerHTML = plan.map(p=>`
+    <div class="action-card">
+      <div class="priority">Priority ${p.priority} · ${p.section} · Deadline: ${p.deadline||'31 Mar 2025'}</div>
+      <div class="text">${p.action}</div>
+      <div class="impact">Invest ${inr(p.invest_amount)} → Save ${inr(p.tax_saved)} in tax</div>
+    </div>`).join('');
+
+  // Advance tax
+  const adv = d.advance_tax_schedule || [];
+  if (adv.length) {
+    document.getElementById('tw-advance').innerHTML = adv.map(a=>`
+      <tr><td>Q${a.quarter}</td><td>${a.due_date}</td><td>${inr(a.amount_due)}</td></tr>`).join('');
+  } else {
+    document.getElementById('tw-advance-section').style.display = 'none';
+  }
+
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ═══════════════════════════════════════════════
+   LIFE EVENTS
+═══════════════════════════════════════════════ */
+function updateEventFields() {
+  const event = document.getElementById('le-event').value;
+  document.getElementById('le-home-wrap').style.display = event==='home_purchase'?'':'none';
+  const labels = {
+    bonus:'Bonus Amount (₹)',inheritance:'Inheritance Amount (₹)',
+    marriage:'Wedding Budget (₹)',new_baby:'Baby Fund Available (₹)',
+    job_change:'New Annual CTC (₹)',home_purchase:'Down Payment Available (₹)',
+    retirement:'Retirement Corpus (₹)',medical_emergency:'Medical Cost (₹)'
+  };
+  document.getElementById('le-amount-label').textContent = labels[event]||'Event Amount (₹)';
+}
+
+async function runLifeEvent() {
+  setLoading('le-btn','le-spinner',true);
+  try {
+    const payload = {
+      event:              document.getElementById('le-event').value,
+      event_amount:       +document.getElementById('le-amount').value || null,
+      monthly_income:     +document.getElementById('le-income').value || null,
+      monthly_expenses:   +document.getElementById('le-expenses').value || null,
+      age:                +document.getElementById('le-age').value || null,
+      home_value:         +document.getElementById('le-home-value').value || null,
+      additional_context: document.getElementById('le-context').value,
+    };
+    const res = await api('/agents/life-event','POST', payload);
+    renderLifeEvent(res.data);
+  } catch(e) { alert('Error: '+e.message); }
+  setLoading('le-btn','le-spinner',false);
+}
+
+function renderLifeEvent(d) {
+  const panel = document.getElementById('le-result');
+  panel.classList.add('show');
+
+  document.getElementById('le-summary').textContent = d.event_summary || '—';
+
+  const actions = d.immediate_actions || [];
+  const urgColor = {critical:'var(--red)',high:'var(--gold)',medium:'var(--blue)'};
+  document.getElementById('le-actions').innerHTML = actions.map(a=>`
+    <div class="action-card" style="border-left:3px solid ${urgColor[a.priority]||'var(--border)'}">
+      <div class="priority" style="color:${urgColor[a.priority]}">${a.timeline} · ${a.priority?.toUpperCase()}</div>
+      <div class="text">${a.action}</div>
+      ${a.amount?`<div class="impact">Amount: ${inr(a.amount)}</div>`:''}
+    </div>`).join('');
+
+  // Allocation plan
+  const alloc = d.allocation_plan;
+  if (alloc?.buckets?.length) {
+    document.getElementById('le-alloc-section').style.display = '';
+    document.getElementById('le-alloc-body').innerHTML = alloc.buckets.map(b=>`
+      <tr>
+        <td><strong>${b.bucket}</strong></td>
+        <td>${inr(b.amount)}</td>
+        <td>${b.pct||'—'}%</td>
+        <td><span class="stat-badge badge-gold" style="font-size:10px">${b.instrument||'—'}</span></td>
+        <td style="color:var(--muted);font-size:12px">${b.rationale||''}</td>
+      </tr>`).join('');
+  }
+
+  // 30-day checklist
+  document.getElementById('le-checklist').innerHTML = (d['30_day_checklist']||[]).map(i=>`
+    <li class="insight-item"><div class="insight-dot"></div>${i}</li>`).join('');
+
+  // Risks
+  document.getElementById('le-risks').innerHTML = (d.risks_to_avoid||[]).map(r=>`
+    <span class="pill" style="background:rgba(231,76,60,.08);border-color:rgba(231,76,60,.2);color:var(--red)">⚠ ${r}</span>`).join('');
+
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ═══════════════════════════════════════════════
+   PROFILE
+═══════════════════════════════════════════════ */
+async function saveProfile() {
+  document.getElementById('pr-spinner').style.display='inline-block';
+  const payload = {
+    age:                    +document.getElementById('pr-age').value||null,
+    city:                   document.getElementById('pr-city').value||null,
+    monthly_income:         +document.getElementById('pr-income').value||null,
+    monthly_expenses:       +document.getElementById('pr-expenses').value||null,
+    annual_bonus:           +document.getElementById('pr-bonus').value||0,
+    existing_mutual_funds:  +document.getElementById('pr-mf').value||0,
+    existing_stocks:        +document.getElementById('pr-stocks').value||0,
+    existing_ppf:           +document.getElementById('pr-ppf').value||0,
+    existing_nps:           +document.getElementById('pr-nps').value||0,
+    existing_fd:            +document.getElementById('pr-fd').value||0,
+    existing_real_estate:   +document.getElementById('pr-re').value||0,
+    home_loan_outstanding:  +document.getElementById('pr-homeloan').value||0,
+    car_loan_outstanding:   +document.getElementById('pr-carloan').value||0,
+    personal_loan_outstanding:+document.getElementById('pr-personal').value||0,
+    credit_card_debt:       +document.getElementById('pr-cc').value||0,
+    life_cover:             +document.getElementById('pr-life').value||0,
+    health_cover:           +document.getElementById('pr-health').value||0,
+    section_80c_used:       +document.getElementById('pr-80c').value||0,
+    nps_contribution:       +document.getElementById('pr-npsc').value||0,
+    target_retirement_age:  +document.getElementById('pr-retage').value||60,
+    has_term_plan:          document.getElementById('pr-term').checked,
+    risk_profile:           document.getElementById('pr-risk').value,
+  };
+  try {
+    await api('/auth/profile','PATCH', payload);
+    const msg = document.getElementById('pr-msg');
+    msg.innerHTML = '<div class="alert alert-success">✅ Profile saved! All agents will now use your data automatically.</div>';
+    msg.style.display='block';
+    updateDashboardFromProfile(payload);
+    document.getElementById('setup-banner').style.display='none';
+    setTimeout(()=>msg.style.display='none', 4000);
+  } catch(e){
+    const msg = document.getElementById('pr-msg');
+    msg.innerHTML = `<div class="alert alert-error">❌ ${e.message}</div>`;
+    msg.style.display='block';
+  }
+  document.getElementById('pr-spinner').style.display='none';
+}
+
+async function loadProfile() {
+  try {
+    const p = await api('/auth/profile');
+    if (!p || !Object.keys(p).length) return;
+    const set = (id,val) => { if(val!=null&&document.getElementById(id)) document.getElementById(id).value=val; };
+    set('pr-age',p.age); set('pr-city',p.city);
+    set('pr-income',p.monthly_income); set('pr-expenses',p.monthly_expenses);
+    set('pr-bonus',p.annual_bonus); set('pr-mf',p.existing_mutual_funds);
+    set('pr-stocks',p.existing_stocks); set('pr-ppf',p.existing_ppf);
+    set('pr-nps',p.existing_nps); set('pr-fd',p.existing_fd);
+    set('pr-re',p.existing_real_estate); set('pr-homeloan',p.home_loan_outstanding);
+    set('pr-carloan',p.car_loan_outstanding); set('pr-personal',p.personal_loan_outstanding);
+    set('pr-cc',p.credit_card_debt); set('pr-life',p.life_cover);
+    set('pr-health',p.health_cover); set('pr-80c',p.section_80c_used);
+    set('pr-npsc',p.nps_contribution); set('pr-retage',p.target_retirement_age);
+    if(p.risk_profile) document.getElementById('pr-risk').value=p.risk_profile;
+    if(p.has_term_plan) document.getElementById('pr-term').checked=true;
+    updateDashboardFromProfile(p);
+    if(p.monthly_income) document.getElementById('setup-banner').style.display='none';
+  } catch(e){}
+}
+
+function updateDashboardFromProfile(p) {
+  if(p.monthly_income) document.getElementById('dash-income').textContent=inr(p.monthly_income);
+  const inv = (p.existing_mutual_funds||0)+(p.existing_stocks||0)+(p.existing_ppf||0)+(p.existing_nps||0)+(p.existing_fd||0);
+  if(inv) document.getElementById('dash-investments').textContent=inr(inv);
+  if(p.monthly_income&&p.monthly_expenses){
+    const rate=((p.monthly_income-p.monthly_expenses)/p.monthly_income*100).toFixed(1);
+    document.getElementById('dash-savings-rate').textContent=rate+'%';
+  }
+}
+</script>
+</body>
+</html>
+<script>
+// ── PATCH: inject Report nav + page into existing app ──────────────────────
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  // 1. Add Report nav item to sidebar
+  const nav = document.querySelector('.nav');
+  const reportNavItem = document.createElement('div');
+  reportNavItem.className = 'nav-item';
+  reportNavItem.id = 'nav-report';
+  reportNavItem.innerHTML = '<span class="nav-icon">⬡</span> Generate Report';
+  reportNavItem.onclick = () => showPage('report');
+  nav.appendChild(reportNavItem);
+
+  // 2. Inject Report page into main
+  const main = document.querySelector('.main');
+  const reportPage = document.createElement('div');
+  reportPage.className = 'page';
+  reportPage.id = 'page-report';
+  reportPage.innerHTML = `
+    <div class="page-header">
+      <h1>Generate Report</h1>
+      <p>Download a professional multi-page PDF of your complete financial analysis</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+      <div class="card" style="border:1px solid rgba(212,168,67,.3);background:linear-gradient(135deg,rgba(212,168,67,.06),rgba(212,168,67,.02))">
+        <div class="card-title" style="color:var(--gold)">What's in the report</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:10px">
+          ${[
+            ['◎','Health Score','6-dimension score + priority actions'],
+            ['◈','FIRE Planner','Corpus target + SIP breakdown + milestones'],
+            ['◐','Tax Analysis','Old vs New regime + deduction gaps + action plan'],
+            ['◇','Portfolio X-Ray','Fund ratings + rebalancing steps (if CAMS uploaded)'],
+            ['⬡','Executive Summary','Net worth + savings rate + AI assessment'],
+          ].map(([icon,title,sub])=>`
+            <li style="display:flex;gap:12px;align-items:flex-start">
+              <span style="color:var(--gold);font-size:14px;margin-top:2px">${icon}</span>
+              <div>
+                <div style="font-size:13px;font-weight:500">${title}</div>
+                <div style="font-size:11px;color:var(--muted)">${sub}</div>
+              </div>
+            </li>`).join('')}
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Report Preview</div>
+        <div id="report-preview-content">
+          <div style="display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px">
+            <div class="spinner"></div> Loading preview...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="text-align:center;padding:40px">
+      <div style="font-size:48px;margin-bottom:16px">📄</div>
+      <h3 style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:8px">
+        Professional Financial Report
+      </h3>
+      <p style="color:var(--muted);font-size:13px;max-width:400px;margin:0 auto 24px">
+        All agents run automatically against your saved profile.
+        Complete your profile first for the best results.
+      </p>
+      <button class="btn-run" id="report-btn" onclick="downloadReport()" style="font-size:15px;padding:14px 40px">
+        <span class="spinner" id="report-spinner" style="display:none"></span>
+        ⬡ &nbsp;Generate & Download PDF
+      </button>
+      <div id="report-status" style="margin-top:16px;font-size:13px;color:var(--muted)"></div>
+      <p style="margin-top:16px;font-size:11px;color:var(--muted)">
+        Takes 15–45 seconds · All AI agents run in sequence · Typically 4–6 pages
+      </p>
+    </div>
+  `;
+  main.appendChild(reportPage);
+
+  // 3. Load preview when page opens
+  const origShowPage = window.showPage;
+  window.showPage = function(id) {
+    origShowPage(id);
+    if (id === 'report') loadReportPreview();
+  };
+
+  window.loadReportPreview = async function() {
+    try {
+      const data = await api('/report/preview');
+      document.getElementById('report-preview-content').innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;font-size:13px">
+            <span style="color:var(--muted)">Profile complete</span>
+            <span style="color:${data.profile_complete?'var(--green)':'var(--red)'}">${data.profile_complete?'✓ Yes':'✗ No — set up profile first'}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px">
+            <span style="color:var(--muted)">Portfolio data</span>
+            <span style="color:${data.has_portfolio?'var(--green)':'var(--muted)'}">${data.has_portfolio?'✓ CAMS uploaded':'Not uploaded (optional)'}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px">
+            <span style="color:var(--muted)">Estimated pages</span>
+            <span style="color:var(--gold)">${data.estimated_pages} pages</span>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--border);margin:4px 0"/>
+          <div style="font-size:11px;color:var(--muted)">Sections:</div>
+          ${(data.sections_in_report||[]).filter(Boolean).map(s=>`
+            <div style="display:flex;gap:8px;font-size:12px;align-items:center">
+              <span style="color:var(--green)">✓</span> ${s}
+            </div>`).join('')}
+        </div>`;
+    } catch(e) {
+      document.getElementById('report-preview-content').innerHTML =
+        '<div style="color:var(--muted);font-size:13px">Set up your profile to see the preview.</div>';
+    }
+  };
+
+  window.downloadReport = async function() {
+    const btn = document.getElementById('report-btn');
+    const spinner = document.getElementById('report-spinner');
+    const status = document.getElementById('report-status');
+
+    btn.disabled = true;
+    spinner.style.display = 'inline-block';
+    status.textContent = '⏳ Running all agents… this takes 15–45 seconds';
+
+    const steps = [
+      '◎ Running Health Score agent…',
+      '◈ Running FIRE Planner agent…',
+      '◐ Running Tax Wizard agent…',
+      '◇ Running Portfolio X-Ray…',
+      '⬡ Composing your report…',
+    ];
+    let step = 0;
+    const stepTimer = setInterval(() => {
+      if (step < steps.length) { status.textContent = steps[step++]; }
+    }, 7000);
+
+    try {
+      const res = await fetch(API + '/report/generate', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + TOKEN },
+      });
+      clearInterval(stepTimer);
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || 'Report generation failed');
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'AI_Money_Mentor_Report.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+      status.innerHTML = '✅ <span style="color:var(--green)">Report downloaded! Check your downloads folder.</span>';
+
+    } catch(e) {
+      clearInterval(stepTimer);
+      status.innerHTML = '❌ <span style="color:var(--red)">' + e.message + '</span>';
+    }
+
+    btn.disabled = false;
+    spinner.style.display = 'none';
+  };
+});
+</script>
