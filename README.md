@@ -60,7 +60,7 @@ That's it. No Docker, no PostgreSQL, no Redis. Runs on any laptop.
 
 ```bash
 # 1. Clone and enter the project
-git clone <https://github.com/123qwertyuiopaz/ai-money-mentor>
+git clone https://github.com/123qwertyuiopaz/ai-money-mentor
 cd ai-money-mentor
 
 # 2. Create a virtual environment
