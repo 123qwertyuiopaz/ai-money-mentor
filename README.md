@@ -78,10 +78,13 @@ cp .env.example .env
 
 # 5. Run the server
 uvicorn app.main:app --reload
+#6. NOW open new terminal run the index.html
+start index.html     
 ```
 
 The API is now live at **http://localhost:8000**
 Interactive docs at **http://localhost:8000/docs**
+
 
 ---
 
